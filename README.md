@@ -13,8 +13,13 @@ The other scripts implement a Monte-Carlo simulation to test and optimize the pr
 ## Usage
 To perform a measurement two additional functions are required: 1) A function that presents a stimulus, i.e., "presentstimulus", and 2) a function to retrieve a response from the subject, e.g., "getanswer".
 
+### Example 1
 An example is provided in the script "play_example_measurement.m", which implements a simple task, performs the measurement, and visualizes some information of the measurement afterwards.
 
+### Example 2
+Another example can be found in the code of the [hearingaid-prototype repository](https://github.com/m-r-s/hearingaid-prototype/blob/2.2/tools/measure_sweep.m#L53), where it is used to perform an in-situ measurement of the hearing threshold.
+
+### Monte-Carlo simulation
 To run the pre-configured Monte-Carlo simulations, just run the script "play_montecarlo_siam.m" with GNU/Octave (or Matlab).
 The script sets up a virtual answerer which is always presented with the correct answer and stochastically decides on the response based on the configured psychometric function.
 The simulations can help to test if the SIAM procedure works as expected (which is does not with the parameters proposed in the literature [1]).
