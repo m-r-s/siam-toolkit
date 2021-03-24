@@ -7,8 +7,9 @@ function [threshold, values, reversals, measures, presentations, answers, adjust
 % E-mail: marc.r.schaedler@uni-oldenburg.de
 %
 % [1] Kaernbach, C. (1990). A single‐interval adjustment‐matrix (SIAM) procedure for unbiased adaptive testing. The Journal of the Acoustical Society of America, 88(6), 2645-2655. https://doi.org/10.1121/1.399985
+% Contribution: David Hülsmeier
 
-% Example config  
+% Example config
 %  target = 0.75;
 %  minreversals = 14;
 %  discardreversals = 4;
@@ -21,6 +22,11 @@ function [threshold, values, reversals, measures, presentations, answers, adjust
 value = startvalue;
 direction = [];
 count = 0;
+
+% Definition for clipping
+clip_count = 0;
+clip_count_to_abort_experiment = 5;
+clip_value = 115; % dB ; maximum presentation level
 
 threshold = nan;
 values = [];
@@ -39,24 +45,31 @@ assert(discardreversals>=0 && discardreversals<minreversals);
 assert(minmeasures >= 1);
 
 % Measure loop
-while sum(abs(reversals))<minreversals || sum(presentations(measures==1))<minmeasures
+while sum(abs(reversals))<minreversals || sum(presentations(measures==1))<minmeasures || clip_count>clip_count_to_abort_experiment
   count = count + 1;
-  
+
+  % omit clipping
+  if value > clip_value
+    value = clip_value;
+    clip_count = clip_count + 1;
+  end
+
   % Present random stimulus after third presentation
   if count < 4
     presentation = 1;
   else
     presentation = round(rand(1));
   end
+
   offset = presentationhandle(presentation, value);
   presentations(count) = presentation;
   values(count) = value;
   offsets(count) = offset;
-  
+
   % Get answer
   answer = answerhandle(count, presentation, value);
   answers(count) = answer;
-  
+
   %% Give feedback
   if feedback
     if answer == presentation
@@ -65,14 +78,14 @@ while sum(abs(reversals))<minreversals || sum(presentations(measures==1))<minmea
       printf('%3i| WRONG!\n',count);
     end
   end
-  
+
   % Determine adjustment
   adjustment = adjustment_matrix(2-presentation, 2-answer) .* steps(min(1+sum(abs(reversals)),end));
   adjustments(count) = adjustment;
-  
+
   % Apply adjustment
   value = value + adjustment;
-  
+
   % Detect reversals
   if isempty(direction) && adjustment ~= 0
     direction = adjustment;
@@ -82,7 +95,7 @@ while sum(abs(reversals))<minreversals || sum(presentations(measures==1))<minmea
   else
     reversals(count) = 0;
   end
-  
+
   % Mark measures
   if sum(abs(reversals)) > discardreversals
     measures(count) = 1;
@@ -98,4 +111,3 @@ if sum(abs(reversals))>=minreversals && sum(measures)>=minmeasures
   threshold = median(usereversalvalues);
 end
 end
-
