@@ -45,7 +45,7 @@ assert(discardreversals>=0 && discardreversals<minreversals);
 assert(minmeasures >= 1);
 
 % Measure loop
-while sum(abs(reversals))<minreversals || sum(presentations(measures==1))<minmeasures || clip_count<clip_count_to_abort_experiment
+while ( sum(abs(reversals))<minreversals || sum(presentations(measures==1))<minmeasures ) && clip_count<clip_count_to_abort_experiment
   count = count + 1;
 
   % omit clipping
