@@ -27,7 +27,7 @@ function noise_offset = presentstimulus(presentation, value)
   end
   noise_offset = randn(1).*10.^(-value/20);
   present_value = present_value + noise_offset;
-  printf('   | Is the true value higher than 0? %.2f\n',present_value);
+  printf('   | Is the true value grater than zero? %.2f\n',present_value);
 end
 
 function answer = getanswer(count)
